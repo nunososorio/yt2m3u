@@ -21,4 +21,4 @@ if channel_url:
     # Create a download button for the m3u file
     with open("pages/dytchan2.m3u", "r") as f:
         file_contents = f.read()
-        st.download_button(label="Download m3u file", data=file_contents, file_name="dytchan2.m3u", mime="audio/x-mpegurl")
+        st.download_button(label="Download m3u file final", data=file_contents, file_name="dytchan2.m3u", mime="audio/x-mpegurl")
