@@ -3,9 +3,18 @@ from pytube import Playlist
 
 st.title('YouTube Playlist Downloader')
 
+playlist_history = st.session_state.get('playlist_history', [])
+
 playlist_url = st.text_input('Enter YouTube playlist URL:')
 
 if playlist_url:
+    playlist_history.append(playlist_url)
+    st.session_state['playlist_history'] = playlist_history[-5:]
+    
+    st.write('Playlist history:')
+    for url in playlist_history:
+        st.write(url)
+    
     playlist = Playlist(playlist_url)
     m3u_content = '#EXTM3U\n'
     for video in playlist.videos:
