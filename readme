@@ -1,1 +1,25 @@
-test app
+# yt2m3u - YouTube Playlist to m3u Downloader
+
+`yt2m3u` is a simple web app that allows you to download an m3u file for a given YouTube playlist. The app is deployed at [yt2m3u.streamlit.app](https://yt2m3u.streamlit.app).
+
+## Usage
+
+To use the `yt2m3u` app, simply visit [yt2m3u.streamlit.app](https://yt2m3u.streamlit.app) in your web browser. You can then enter the URL of a YouTube playlist and click the "Download m3u file" button to download an m3u file for the playlist.
+
+## Potential Use Cases
+
+The `yt2m3u` app can be useful in a variety of situations. For example, you could use it to:
+
+- Download an m3u file for a YouTube playlist so that you can play the videos in a media player that supports m3u files.
+- Create custom playlists by combining videos from multiple YouTube playlists into a single m3u file.
+- Share a YouTube playlist with someone else by sending them an m3u file instead of a link to the playlist.
+
+## Disclaimer
+
+Please note that `yt2m3u` is an experimental app for testing and development purposes only. Use it at your own risk.
+
+When using `yt2m3u`, please be aware of copyright issues and YouTube policies. It is your responsibility to ensure that you have the necessary rights and permissions to download and use the content from YouTube playlists.
+
+## License
+
+`yt2m3u` is released under the [MIT License](https://opensource.org/licenses/MIT)
