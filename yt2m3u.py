@@ -25,10 +25,6 @@ if playlist_url:
         m3u_content += f'#EXTINF:-1,{video.title}\n{video_url}\n'
     st.download_button(label='Download m3u file', data=m3u_content, mime='audio/x-mpegurl', file_name='playlist.m3u')
 
-    # Open and read the playlist.m3u file
-    with open('playlist.m3u', 'r') as f:
-        m3u_content = f.read()
-
     # Extract the sparams value using a regular expression
     sparams_match = re.search(r'sparams=([^&]+)', m3u_content)
     if sparams_match:
@@ -40,4 +36,4 @@ if playlist_url:
             # Convert the expire parameter to a datetime object
             expire_datetime = datetime.fromtimestamp(expire)
             # Display the expiration datetime in the app
-            st.write(f'Download will expire on: {expire_datetime}')
+            st.write(f'The playlist will expire on: {expire_datetime}')
