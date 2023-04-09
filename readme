@@ -17,4 +17,8 @@ if channel_url:
         for url in video_urls:
             f.write(f"#EXTINF:-1,{url}\n{url}\n")
     st.success("Playlist downloaded successfully!")
-    st.markdown("Download the m3u file [here](dytchan2.m3u)")
+    
+    # Create a download button for the m3u file
+    with open("pages/dytchan2.m3u", "r") as f:
+        file_contents = f.read()
+        st.download_button(label="Download m3u file", data=file_contents, file_name="dytchan2.m3u", mime="audio/x-mpegurl")
