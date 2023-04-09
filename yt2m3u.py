@@ -9,6 +9,7 @@ channel_url = st.text_input("Enter the YouTube playlist URL:", value="https://m.
 if channel_url:
     # Create a Playlist object
     playlistx = Playlist(channel_url)
+    print(playlistx.video_urls)  # Debugging line
     # Create a list of video download URLs
     video_urls = [video.streams.get_highest_resolution().url for video in playlistx]
     # Write the video download URLs to a local m3u playlist file named dytchan2.m3u
@@ -16,7 +17,7 @@ if channel_url:
         f.write("#EXTM3U\n")
         for url in video_urls:
             f.write(f"#EXTINF:-1,{url}\n{url}\n")
-    st.success("Playlist conversion was successfull!")
+    st.success("Playlist downloaded successfully!")
     
     # Create a download button for the m3u file
     with open("pages/dytchan2.m3u", "r") as f:
