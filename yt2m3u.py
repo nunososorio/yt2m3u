@@ -15,7 +15,9 @@ if channel_url:
         videos = list(executor.map(YouTube, playlistx))
     # Create a list of video download URLs
     video_urls = [video.streams.get_highest_resolution().url for video in videos]
-    # Write the video download URLs to a local m3u playlist file named dytchan2.m3u
+    # Clear the contents of the dytchan2.m3u file
+    open("dytchan2.m3u", "w").close()
+    # Write the video download URLs to the dytchan2.m3u file
     with open("dytchan2.m3u", "w") as f:
         f.write("#EXTM3U\n")
         for url in video_urls:
