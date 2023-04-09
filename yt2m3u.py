@@ -27,8 +27,11 @@ if playlist_url:
 
     # Extract the sparams value using a regular expression
     sparams_match = re.search(r'sparams=([^&]+)', m3u_content)
+    st.write(f'm3u_content: {m3u_content}')
+    st.write(f'sparams_match: {sparams_match}')
     if sparams_match:
         sparams = sparams_match.group(1)
+        st.write(f'sparams: {sparams}')
         # Parse the sparams value to extract the expire parameter
         expire_match = re.search(r'expire%3D(\d+)', sparams)
         if expire_match:
@@ -36,4 +39,4 @@ if playlist_url:
             # Convert the expire parameter to a datetime object
             expire_datetime = datetime.fromtimestamp(expire)
             # Display the expiration datetime in the app
-            st.write(f'The playlist will expire on: {expire_datetime}')
+            st.write(f'Download will expire on: {expire_datetime}')
