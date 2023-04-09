@@ -1,7 +1,7 @@
 import streamlit as st
 from pytube import Playlist
 
-st.title('YouTube Playlist Downloader')
+st.title('yt2m3u - YouTube Playlist to m3u Downloader')
 
 playlist_history = st.session_state.get('playlist_history', [])
 
