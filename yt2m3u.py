@@ -5,7 +5,7 @@ st.title('yt2m3u - YouTube Playlist to m3u Downloader')
 
 playlist_history = st.session_state.get('playlist_history', [])
 
-playlist_url = st.text_input('Enter YouTube playlist URL:')
+playlist_url = st.text_input('Enter YouTube playlist URL:', value='https://m.youtube.com/playlist?list=PL-gWsve6MojDIwDIhpxhMlqEn3dKz8f9a')
 
 if playlist_url:
     playlist_history.append(playlist_url)
