@@ -27,13 +27,10 @@ if playlist_url:
 
     # Extract the sparams value using a regular expression
     sparams_match = re.search(r'sparams=([^&]+)', m3u_content)
-    st.write(f'm3u_content: {m3u_content}')
-    st.write(f'sparams_match: {sparams_match}')
     if sparams_match:
         sparams = sparams_match.group(1)
-        st.write(f'sparams: {sparams}')
         # Parse the sparams value to extract the expire parameter
-        expire_match = re.search(r'expire%3D(\d+)', sparams)
+        expire_match = re.search(r'expire%253D(\d+)', sparams)
         if expire_match:
             expire = int(expire_match.group(1))
             # Convert the expire parameter to a datetime object
