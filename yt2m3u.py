@@ -1,5 +1,6 @@
 import streamlit as st
 from pytube import Playlist
+import pytube
 
 st.title("yt2m3u - YouTube Playlist to m3u")
 
@@ -11,7 +12,11 @@ if channel_url:
     playlistx = Playlist(channel_url)
     print(playlistx.video_urls)  # Debugging line
     # Create a list of video download URLs
-    video_urls = [video.streams.get_highest_resolution().url for video in playlistx]
+    video_urls = []
+    for video in playlistx:
+        if isinstance(video, str):
+            video = pytube.YouTube(video)
+        video_urls.append(video.streams.get_highest_resolution().url)
     # Write the video download URLs to a local m3u playlist file named dytchan2.m3u
     with open("pages/dytchan2.m3u", "w") as f:
         f.write("#EXTM3U\n")
