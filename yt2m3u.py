@@ -25,7 +25,6 @@ st.write('## Potential Use Cases')
 st.write('The `yt2m3u` app can be useful in a variety of situations. For example, you could use it to:')
 st.write('- Download an m3u file for a YouTube playlist so that you can play the videos in a media player that supports m3u files.')
 st.write('- Create custom playlists by combining videos from multiple YouTube playlists into a single m3u file.')
-st.write('- Share a YouTube playlist with someone else by sending them an m3u file instead of a link to the playlist.')
 
 st.write('## Disclaimer')
 st.write('Please note that `yt2m3u` is an experimental app for testing and development purposes only. Use it at your own risk.')
