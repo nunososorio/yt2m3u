@@ -11,7 +11,6 @@ To use the `yt2m3u` app, simply visit [yt2m3u.streamlit.app](https://yt2m3u.stre
 The `yt2m3u` app can be useful in a variety of situations. For example, you could use it to:
 
 - Download an m3u file for a YouTube playlist so that you can play the videos in a media player that supports m3u files.
-- Create custom playlists by combining videos from multiple YouTube playlists into a single m3u file.
 
 ## Disclaimer
 
