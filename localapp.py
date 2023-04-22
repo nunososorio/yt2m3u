@@ -1,4 +1,5 @@
-import streamlit as st
+ 
+    import streamlit as st
 from pytube import Playlist
 from concurrent.futures import ThreadPoolExecutor
 
@@ -18,18 +19,24 @@ if playlist_url:
             video_stream = video.streams.filter(progressive=True).order_by("resolution").desc().first()
             video_url = video_stream.url
             video_title = video.title
+            video_default_filename = video.default_filename
         except KeyError:
-            st.warning(f"No streaming data available for video: {video.default_filename}")
+            st.warning(f"No streaming data available for video: {video.title}")
             video_url = None
-            video_title = video.default_filename
+            video_title = video.title
+            video_default_filename = None
         except Exception as e:
-            st.error(f"Error processing video {video.default_filename}: {e}")
+            st.error(f"Error processing video {video.title}: {e}")
             video_url = None
-            video_title = video.default_filename
+            video_title = video.title
+            video_default_filename = None
 
         # Return the video stream as an m3u entry
         if video_url:
-            return f"#EXTINF:-1,{video_title}\n{video_url}\n"
+            if video_default_filename:
+                return f"#EXTINF:-1,{video_default_filename}\n{video_url}\n"
+            else:
+                return f"#EXTINF:-1,{video_title}\n{video_url}\n"
         else:
             return ""
 
@@ -51,4 +58,3 @@ if playlist_url:
 
     # Display a success message to the user
     st.success("Playlist successfully downloaded!")
-    
