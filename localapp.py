@@ -20,8 +20,8 @@ def write_to_m3u(links, filename):
             f.write(f'{link}') 
 
 url = st.text_input('Enter a YouTube playlist URL') 
-st.button('Get Download Links') 
-if st.button('Get Download Links'): 
+st.button('Get Download Links', key='download_links_btn') 
+if st.button('Get Download Links', key='download_links_btn'): 
     links = get_links(url) 
     write_to_m3u(links, 'ytplay.m3u') 
     st.success('Download links saved to ytplay.m3u!')
