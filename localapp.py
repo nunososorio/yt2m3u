@@ -1,63 +1,30 @@
-import streamlit as st
+import streamlit as st 
+import pytube 
 
-from pytube import Playlist
+def get_links(playlist_url): 
+    links = [] 
+    response = requests.get(playlist_url) 
+    html = response.text 
+  
+    for link in re.findall('https://www.youtube.com/watch\?v=(.*?)"', html): 
+        video_link = f"https://www.youtube.com/watch?v={link}"
+        video = pytube.YouTube(video_link)
+        mp4_link = video.streams.first().url 
+        title = video.title 
+        links.append(f"#EXTINF:-1,{title}\n{mp4_link}\n") 
+    return links 
 
-from concurrent.futures import ThreadPoolExecutor
+def write_to_m3u(links, filename): 
+    with open(filename, 'w') as f: 
+        for link in links: 
+            f.write(f'{link}') 
 
-st.title("yt2m3u - YouTube Playlist to m3u Downloader")
+url = st.text_input('Enter a YouTube playlist URL') 
+st.button('Get Download Links') 
+if st.button('Get Download Links'): 
+    links = get_links(url) 
+    write_to_m3u(links, 'ytplay.m3u') 
+    st.success('Download links saved to ytplay.m3u!')
 
-# Get the playlist URL from the user
-
-playlist_url = st.text_input("Enter YouTube playlist URL:", value="https://m.youtube.com/playlist?list=PL-gWsve6MojDIwDIhpxhMlqEn3dKz8f9a") 
-
-if playlist_url:
-
-    try: 
-
-        playlist = Playlist(playlist_url)
-
-    except KeyError:
-
-        st.error("Invalid playlist URL")
-
-# Write m3u file to disk    
-
-with open("ytplay.m3u", "w") as f:
-
-    f.write("#EXTM3U\n")
-
-progress_bar = st.progress(0)  
-
-with ThreadPoolExecutor() as executor:
-
-    for i, video in enumerate(playlist.videos):     
-
-        # Update progress bar
-
-        progress_bar.progress((i+1)/len(playlist.videos))
-
-        
-
-        # Get video stream 
-
-        try:  
-
-            video_stream = video.streams.filter(progressive=True).order_by("resolution").desc().first()
-
-            video_url = video_stream.url
-
-            with open("ytplay.m3u", "a") as f:
-
-                f.write(f"#EXTINF:-1,{video.title}\n{video_url}\n")
-
-        except KeyError:  
-
-            st.warning(f"No streaming data available for video: {video.title}") 
-
-        except yt.exceptions.VideoPrivate:
-
-            st.warning(f"Video {video.title} is private")
-
-        except yt.exceptions.VideoDeleted:
-
-            st.warning(f"Video {video.title} has been deleted")
+if __name__ == '__main__': 
+    main()
