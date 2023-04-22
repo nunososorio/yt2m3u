@@ -17,11 +17,21 @@ if playlist_url:
         try:
             video_stream = video.streams.filter(progressive=True).order_by("resolution").desc().first()
             video_url = video_stream.url
-            return f"#EXTINF:-1,{video.title}\n{video_url}\n"
+            video_title = video.title
         except KeyError:
-            st.warning(f"No streaming data available for video: {video.title}")
+            st.warning(f"No streaming data available for video: {video.default_filename}")
+            video_url = None
+            video_title = video.default_filename
         except Exception as e:
-            st.error(f"Error processing video {video.title}: {e}")
+            st.error(f"Error processing video {video.default_filename}: {e}")
+            video_url = None
+            video_title = video.default_filename
+
+        # Return the video stream as an m3u entry
+        if video_url:
+            return f"#EXTINF:-1,{video_title}\n{video_url}\n"
+        else:
+            return ""
 
     # Use a thread pool to download video streams concurrently
     with ThreadPoolExecutor() as executor:
@@ -41,3 +51,4 @@ if playlist_url:
 
     # Display a success message to the user
     st.success("Playlist successfully downloaded!")
+    
