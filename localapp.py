@@ -15,7 +15,7 @@ def get_video_info(video_url):
         return video_title, video_url
     except Exception as e:
         st.warning(f"Error extracting video info for {video_url}: {e}")
-        return None, None
+        return "Unknown Title", None
 
 # Function to extract video links and titles for a playlist
 def get_playlist_info(playlist_url):
@@ -61,8 +61,3 @@ def main():
             label="Download ytplay.m3u",
             data=m3u_file_contents,
             file_name="ytplay.m3u",
-            mime="audio/mpegurl"
-        )
-
-if __name__ == '__main__':
-    main()
