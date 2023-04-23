@@ -88,5 +88,11 @@ def app():
         with open(file_path, mode='r', encoding='utf-8') as m3u_file:
             m3u_file_contents = m3u_file.read()
         st.text_area("Download Links:", value=m3u_file_contents, height=500)
+        st.download_button(
+            label="Download Playlist File",
+            data=m3u_file_contents,
+            file_name="ytplay.m3u",
+            mime="text/plain"
+        )
 
 app()
