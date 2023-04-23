@@ -3,6 +3,8 @@ import pytube
 import pafy
 import os
 import concurrent.futures
+import asyncio
+import aiohttp
 
 # Function to extract video links and titles using pytube
 def get_video_info_pytube(video_url):
@@ -16,7 +18,7 @@ def get_video_info_pytube(video_url):
             video_url = None
         return video_title, video_url
     except Exception as e:
-        st.warning(f"Error extracting video info for {video_url} using pytube: {e}")
+        st.warning(f"Error extracting video information for {video_url}: {e}")
         return None, None
 
 # Function to extract video links and titles using pafy
@@ -24,73 +26,88 @@ def get_video_info_pafy(video_url):
     try:
         video = pafy.new(video_url)
         video_title = video.title
-        video_streams = video.streams
-        best_video = video.getbestvideo(preftype="mp4")
-        best_audio = video.getbestaudio(preftype="m4a")
-        video_url = f"{best_video.url}+{best_audio.url}"
+        video_best = video.getbest(preftype="mp4")
+        video_url = video_best.url
         return video_title, video_url
     except Exception as e:
-        st.warning(f"Error extracting video info for {video_url} using pafy: {e}")
+        st.warning(f"Error extracting video information for {video_url}: {e}")
         return None, None
 
-# Function to extract video links and titles
-def get_video_info(video_url):
-    with concurrent.futures.ThreadPoolExecutor() as executor:
-        pytube_future = executor.submit(get_video_info_pytube, video_url)
-        pafy_future = executor.submit(get_video_info_pafy, video_url)
-        
-        pytube_result = pytube_future.result()
-        pafy_result = pafy_future.result()
-        
-        if pytube_result[0] or not pafy_result[0]:
-            return pytube_result
-        else:
-            return pafy_result
-
-# Function to extract video links and titles for a playlist
-def get_playlist_info(playlist_url):
+# Function to download a video using aiohttp
+async def download_video(session, video_url, video_title):
     try:
-        playlist = pytube.Playlist(playlist_url)
-        video_links = []
-        for video_url in playlist.video_urls:
-            video_title, video_url = get_video_info(video_url)
-            if video_url:
-                video_links.append((video_title, video_url))
-        return video_links
+        async with session.get(video_url) as response:
+            with open(video_title, 'wb') as f:
+                f.write(await response.read())
     except Exception as e:
-        st.error(f"Error extracting video links: {e}")
-        return []
+        st.warning(f"Error downloading {video_url}: {e}")
 
-# Function to write download links to m3u file
-def write_to_m3u(video_links, file_path):
-    try:
-        with open(file_path, mode='w', encoding='utf-8') as m3u_file:
-            for video_title, video_url in video_links:
-                m3u_file.write(f'#EXTINF:0,{video_title}\n{video_url}\n')
-    except Exception as e:
-        st.error(f"Error writing download links to m3u file: {e}")
-
-# Streamlit app
-def app():
-    st.set_page_config(page_title="YouTube Playlist Downloader", page_icon=":tv:", layout="wide")
+# Main function
+def main():
     st.title("YouTube Playlist Downloader")
+    playlist_url = st.text_input("Enter YouTube playlist URL:")
+    if not playlist_url:
+        st.warning("Please enter a playlist URL.")
+        return
 
-    playlist_url = st.text_input("Enter YouTube Playlist URL:")
-    file_path = os.path.join(os.path.dirname(__file__), 'ytplay.m3u')
+    st.write("Extracting video information...")
+    with concurrent.futures.ThreadPoolExecutor() as executor:
+        if "youtube.com" in playlist_url:
+            get_video_info_func = get_video_info_pytube
+        else:
+            get_video_info_func = get_video_info_pafy
 
-    if st.button("Download Playlist"):
-        st.write("Extracting video links and titles...")
-        video_links = get_playlist_info(playlist_url)
-        if not video_links:
-            st.warning("No videos found in the playlist.")
-            return
-        st.write(f"Found {len(video_links)} videos in the playlist.")
-        st.write("Updating download links in m3u file...")
-        write_to_m3u(video_links, file_path)
-        with open(file_path, mode='r', encoding='utf-8') as m3u_file:
-            m3u_file_contents = m3u_file.read()
-        st.text_area("Download Links:", value=m3u_file_contents, height=500)
-        st.success("Download links have been updated in the m3u file.")
+        with st.spinner("Extracting video information..."):
+            playlist = executor.map(get_video_info_func, pytube.Playlist(playlist_url).video_urls)
+
+    download_links = []
+    for video_title, video_url in playlist:
+        if video_title and video_url:
+            download_links.append(video_url)
+            st.write(f"Video title: {video_title}")
+            st.write(f"Video URL: {video_url}")
+        else:
+            st.warning("Could not extract information for one or more videos in the playlist.")
+
+    if download_links:
+        st.write(f"Total videos to download: {len(download_links)}")
+
+        st.write("Downloading videos...")
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        with aiohttp.ClientSession(loop=loop) as session:
+            tasks = [download_video(session, video_url, f"{i}.mp4") for i, video_url in enumerate(download_links)]
+            loop.run_until_complete(asyncio.gather(*tasks))
+
+        st.write("Writing download links to file...")
+        with open('ytplay.m3u', 'w') as f:
+            f.write('#EXTM3U\n')
+            for i, video_url in enumerate(download_links):
+                f.write(f'#EXTINF:0,{i}\n')
+                f.write(f'{i}.mp4\n')
+
+        st.success("Download complete!")
+        if st.button("Download ytplay.m3u"):
+            with open('ytplay.m3u', 'r') as f:
+                contents = f.read()
+            return st.download_button(
+                label="Download playlist file",
+                data=contents,
+                file_name="ytplay.m3u",
+                mime='audio/x-mpegurl'
+            )
+
+        if st.button("Download video files as zip"):
+            zip_file_name = 'ytplay.zip'
+            with st.spinner(f"Creating {zip_file_name}..."):
+                os.system(f"zip -r {zip_file_name} ./*.mp4")
+            st.success(f"{zip_file_name} created!")
+            return st.download_button(
+                label="Download videos",
+                data=zip_file_name,
+                file_name=zip_file_name,
+                mime='application/zip'
+            )
 
 if __name__ == '__main__':
-    app()
+    main()
