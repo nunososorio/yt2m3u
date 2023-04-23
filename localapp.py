@@ -32,12 +32,14 @@ def main():
     download_links = []
     for video_title, video_url in video_data:
         if video_title and video_url:
-            download_links.append(video_url)
+            # Format the download link with the #EXTINF tag
+            download_link = f"#EXTINF:-1,{video_title}\n{video_url}"
+            download_links.append(download_link)
             st.write(f"- {video_title}")
 
     st.write("\n")
     st.write("To download the videos, copy the following links and paste them into a downloader that supports M3U playlists:")
-    m3u_links = "\n".join(download_links)
+    m3u_links = "#EXTM3U\n" + "\n".join(download_links)
     st.code(m3u_links, language='text')
 
 if __name__ == '__main__':
