@@ -44,7 +44,15 @@ def main():
         st.write(f"Found {len(video_links)} videos in the playlist.")
         st.write("Updating download links in m3u file...")
         write_to_m3u(video_links, file_path)
-        st.write("Done! Download links written to ytplay.m3u in the same folder as app.py.")
+        with open(file_path, mode='r') as m3u_file:
+            m3u_file_contents = m3u_file.read()
+        st.code(m3u_file_contents, language='m3u')
+        st.download_button(
+            label="Download ytplay.m3u",
+            data=m3u_file_contents,
+            file_name="ytplay.m3u",
+            mime="audio/mpegurl"
+        )
 
 if __name__ == '__main__':
     main()
