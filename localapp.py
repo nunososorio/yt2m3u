@@ -1,9 +1,10 @@
 import streamlit as st
 import pytube
+import youtube_dl
 import os
 
-# Function to extract video links and titles
-def get_video_info(video_url):
+# Function to extract video links and titles using pytube
+def get_video_info_pytube(video_url):
     try:
         video = pytube.YouTube(video_url)
         video_title = video.title
@@ -14,8 +15,35 @@ def get_video_info(video_url):
             video_url = None
         return video_title, video_url
     except Exception as e:
-        st.warning(f"Error extracting video info for {video_url}: {e}")
-        return "Unknown Title", None
+        st.warning(f"Error extracting video info for {video_url} using pytube: {e}")
+        return None, None
+
+# Function to extract video links and titles using youtube_dl
+def get_video_info_youtube_dl(video_url):
+    try:
+        ydl_opts = {
+            'outtmpl': '%(id)s.%(ext)s',
+            'quiet': True,
+            'no_warnings': True,
+            'format': 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best',
+        }
+        with youtube_dl.YoutubeDL(ydl_opts) as ydl:
+            video_info = ydl.extract_info(video_url, download=False)
+            video_title = video_info.get('title', 'Unknown Title')
+            video_url = ydl.prepare_filename(video_info)
+            return video_title, video_url
+    except Exception as e:
+        st.warning(f"Error extracting video info for {video_url} using youtube_dl: {e}")
+        return None, None
+
+# Function to extract video links and titles
+def get_video_info(video_url):
+    video_title, video_url = get_video_info_pytube(video_url)
+    if not video_url:
+        video_title, video_url = get_video_info_youtube_dl(video_url)
+    if not video_title:
+        video_title = 'Unknown Title'
+    return video_title, video_url
 
 # Function to extract video links and titles for a playlist
 def get_playlist_info(playlist_url):
