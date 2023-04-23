@@ -1,12 +1,11 @@
+import importlib
 import streamlit as st
-import pytube
-import os
 import concurrent.futures
 
 # Function to extract video links and titles using pytube
-def get_video_info(video_url):
+def get_video_info(video_url, downloader_module):
     try:
-        video = pytube.YouTube(video_url)
+        video = downloader_module.YouTube(video_url)
         video_title = video.title
         video_streams = video.streams.filter(progressive=True, file_extension='mp4').order_by('resolution').desc()
         if video_streams:
@@ -26,10 +25,18 @@ def main():
         st.warning("Please enter a playlist URL.")
         return
 
+    downloader_choice = st.selectbox("Select a downloader:", ("pafy", "youtube_dl", "pytube", "yt_dlp"))
+
+    try:
+        downloader_module = importlib.import_module(downloader_choice)
+    except ImportError:
+        st.warning("Invalid downloader choice.")
+        return
+
     st.write("Extracting video information...")
     with concurrent.futures.ThreadPoolExecutor() as executor:
         # Use a list comprehension to store the video information
-        playlist = [info for info in executor.map(get_video_info, pytube.Playlist(playlist_url).video_urls)]
+        playlist = [info for info in executor.map(lambda url: get_video_info(url, downloader_module), downloader_module.Playlist(playlist_url).video_urls)]
 
     download_links = []
     for video_title, video_url in playlist:
