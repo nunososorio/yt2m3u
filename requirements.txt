@@ -2,3 +2,4 @@ pytube
 pafy
 youtube_dl
 aiohttp
+yt-dlp
