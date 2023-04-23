@@ -57,8 +57,8 @@ async def main():
         else:
             get_video_info_func = get_video_info_pafy
 
-        with st.spinner("Extracting video information..."):
-            playlist = executor.map(get_video_info_func, pytube.Playlist(playlist_url).video_urls)
+        # Use a list comprehension to store the video information
+        playlist = [info for info in executor.map(get_video_info_func, pytube.Playlist(playlist_url).video_urls)]
 
     download_links = []
     for video_title, video_url in playlist:
@@ -73,5 +73,10 @@ async def main():
         st.write(f"Total videos to download: {len(download_links)}")
 
         st.write("Downloading videos...")
-        loop = asyncio.new_event_loop()
-        asyncio.set
+        # Removed the line that creates a new event loop, as it is not needed
+        async with aiohttp.ClientSession() as session:
+            tasks = [download_video(session, video_url, video_title) for video_url, video_title in playlist]
+            await asyncio.gather(*tasks)
+
+# Run the main function
+asyncio.run(main())
