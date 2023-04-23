@@ -41,10 +41,13 @@ def write_to_m3u(video_links, file_path):
         st.error(f"Error writing download links to m3u file: {e}")
 
 # Streamlit app
-def main():
+def app():
+    st.set_page_config(page_title="YouTube Playlist Downloader", page_icon=":tv:", layout="wide")
     st.title("YouTube Playlist Downloader")
+
     playlist_url = st.text_input("Enter YouTube Playlist URL:")
     file_path = os.path.join(os.path.dirname(__file__), 'ytplay.m3u')
+
     if st.button("Download Playlist"):
         st.write("Extracting video links and titles...")
         video_links = get_playlist_info(playlist_url)
@@ -65,4 +68,4 @@ def main():
         )
 
 if __name__ == '__main__':
-    main()
+    app()
