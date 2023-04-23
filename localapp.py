@@ -1,30 +1,35 @@
-import streamlit as st 
-import pytube 
+import streamlit as st
+import pytube
+import re
 
-def get_links(playlist_url): 
-    links = [] 
-    response = requests.get(playlist_url) 
-    html = response.text 
-  
-    for link in re.findall('https://www.youtube.com/watch\?v=(.*?)"', html): 
-        video_link = f"https://www.youtube.com/watch?v={link}"
-        video = pytube.YouTube(video_link)
-        mp4_link = video.streams.first().url 
-        title = video.title 
-        links.append(f"#EXTINF:-1,{title}\n{mp4_link}\n") 
-    return links 
+# Function to extract video links
+def get_video_links(playlist_url):
+    playlist = pytube.Playlist(playlist_url)
+    playlist._video_regex = re.compile(r"\"url\":\"(/watch\?v=[\w-]*)")
+    return [f'https://www.youtube.com{video_url}' for video_url in playlist.video_urls]
 
-def write_to_m3u(links, filename): 
-    with open(filename, 'w') as f: 
-        for link in links: 
-            f.write(f'{link}') 
+# Function to write download links to m3u file
+def write_to_m3u(video_links, file_path):
+    # Clean the m3u file by removing all lines that don't start with #EXTINF:
+    with open(file_path, mode='r') as m3u_file:
+        lines = m3u_file.readlines()
+    with open(file_path, mode='w') as m3u_file:
+        for line in lines:
+            if line.startswith('#EXTINF:'):
+                m3u_file.write(line)
+    # Write the new download links to the m3u file in the correct format
+    with open(file_path, mode='a') as m3u_file:
+        for video_link in video_links:
+            m3u_file.write(f'#EXTINF:0,{video_link}\n{video_link}\n')
 
-url = st.text_input('Enter a YouTube playlist URL') 
-st.button('Get Download Links', key='download_links_btn') 
-if st.button('Get Download Links', key='download_links_btn'): 
-    links = get_links(url) 
-    write_to_m3u(links, 'ytplay.m3u') 
-    st.success('Download links saved to ytplay.m3u!')
-
-if __name__ == '__main__': 
-    main()
+# Streamlit app
+def main():
+    st.title("YouTube Playlist Downloader")
+    playlist_url = st.text_input("Enter YouTube Playlist URL:")
+    if st.button("Download Playlist"):
+        st.write("Extracting video links...")
+        video_links = get_video_links(playlist_url)
+        st.write(f"Found {len(video_links)} videos in the playlist.")
+        st.write("Updating download links in m3u file...")
+        write_to_m3u(video_links, 'ytplay.m3u')
+        st.write("Done!")
