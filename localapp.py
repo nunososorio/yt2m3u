@@ -43,7 +43,7 @@ async def download_video(session, video_url, video_title):
         st.warning(f"Error downloading {video_url}: {e}")
 
 # Main function
-def main():
+async def main():
     st.title("YouTube Playlist Downloader")
     playlist_url = st.text_input("Enter YouTube playlist URL:")
     if not playlist_url:
@@ -74,42 +74,4 @@ def main():
 
         st.write("Downloading videos...")
         loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(loop)
-        async with aiohttp.ClientSession(loop=loop) as session:
-            tasks = [download_video(session, video_url, f"{i}.mp4") for i, video_url in enumerate(download_links)]
-            await asyncio.gather(*tasks)
-
-        st.write("Writing download links to file...")
-        with open('ytplay.m3u', 'w') as f:
-            f.write('#EXTM3U\n')
-            for i, video_url in enumerate(download_links):
-                f.write(f'#EXTINF:0,{i}\n')
-                f.write(f'{i}.mp4\n')
-
-        st.success("Download complete!")
-        if st.button("Download ytplay.m3u"):
-            with open('ytplay.m3u', 'r') as f:
-                contents = f.read()
-            return st.download_button(
-                label="Download playlist file",
-                data=contents,
-                file_name="ytplay.m3u",
-                mime='audio/x-mpegurl'
-            )
-
-        if st.button("Download video files as zip"):
-            zip_file_name = 'ytplay.zip'
-            with st.spinner(f"Creating {zip_file_name}..."):
-                os.system(f"zip -r {zip_file_name} ./*.mp4")
-            st.success(f"{zip_file_name} created!")
-            return st.download_button(
-                label="Download videos",
-                data=zip_file_name,
-                file_name=zip_file_name,
-                mime='application/zip'
-            )
-
-if __name__ == "__main__":
-    main()
-
-
+        asyncio.set
