@@ -75,9 +75,9 @@ def main():
         st.write("Downloading videos...")
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
-        with aiohttp.ClientSession(loop=loop) as session:
+        async with aiohttp.ClientSession(loop=loop) as session:
             tasks = [download_video(session, video_url, f"{i}.mp4") for i, video_url in enumerate(download_links)]
-            loop.run_until_complete(asyncio.gather(*tasks))
+            await asyncio.gather(*tasks)
 
         st.write("Writing download links to file...")
         with open('ytplay.m3u', 'w') as f:
@@ -109,5 +109,7 @@ def main():
                 mime='application/zip'
             )
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
+
+
