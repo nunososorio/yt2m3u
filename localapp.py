@@ -40,7 +40,7 @@ def main():
     st.write("\n")
     st.write("To download the videos, copy the following links and paste them into a downloader that supports M3U playlists:")
     m3u_links = "#EXTM3U\n" + "\n".join(download_links)
-    st.code(m3u_links, language='text', height=15)
+    st.text_area("M3U Links", value=m3u_links, height=300)
 
 if __name__ == '__main__':
     main()
