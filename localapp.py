@@ -2,16 +2,12 @@ import importlib
 import streamlit as st
 import concurrent.futures
 
-# Function to extract video links and titles using the selected downloader module
+# Function to extract video links and titles using pytube
 def get_video_info(video_url, downloader_module):
     try:
-        video_id = downloader_module.extract_video_id(video_url)
-        video = downloader_module.Video(video_id)
+        video = downloader_module.YouTube(video_url)
         video_title = video.title
-        if downloader_module == pafy:
-            video_streams = video.streams
-        else:
-            video_streams = video.streams.filter(progressive=True, file_extension='mp4').order_by('resolution').desc()
+        video_streams = video.streams.filter(progressive=True, file_extension='mp4').order_by('resolution').desc()
         if video_streams:
             video_url = video_streams[0].url
         else:
