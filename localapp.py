@@ -1,6 +1,7 @@
 import streamlit as st
 import pytube
 import re
+import os
 
 # Function to extract video links
 def get_video_links(playlist_url):
@@ -33,6 +34,7 @@ def write_to_m3u(video_links, file_path):
 def main():
     st.title("YouTube Playlist Downloader")
     playlist_url = st.text_input("Enter YouTube Playlist URL:")
+    file_path = os.path.join(os.path.dirname(__file__), 'ytplay.m3u')
     if st.button("Download Playlist"):
         st.write("Extracting video links...")
         video_links = get_video_links(playlist_url)
@@ -41,8 +43,8 @@ def main():
             return
         st.write(f"Found {len(video_links)} videos in the playlist.")
         st.write("Updating download links in m3u file...")
-        write_to_m3u(video_links, 'ytplay.m3u')
-        st.write("Done!")
+        write_to_m3u(video_links, file_path)
+        st.write("Done! Download links written to ytplay.m3u in the same folder as app.py.")
 
 if __name__ == '__main__':
     main()
