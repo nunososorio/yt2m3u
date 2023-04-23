@@ -61,3 +61,8 @@ def main():
             label="Download ytplay.m3u",
             data=m3u_file_contents,
             file_name="ytplay.m3u",
+            mime="audio/mpegurl"
+        )
+
+if __name__ == '__main__':
+    main()
